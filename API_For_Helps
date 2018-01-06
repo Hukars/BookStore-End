@@ -1,0 +1,140 @@
+##管理员添加系统规则
+```javascript
+requestUrl = '/helps/rules/add/'
+method = 'POST'
+
+data{
+    'adminId':'1'
+    'password':'hukars'
+    'ruleId':'4'
+    'ruleDetail':"止于至善"
+}
+//success
+reponse{
+   "result": "ok"
+}
+//fail
+response{
+   'result': 'failed',
+   'reason':'your information is wrong!'
+}
+```
+
+##查看系统规则
+```javascript
+requestUrl = '/helps/rules/'
+method = 'GET'
+query_params{
+    无
+}
+
+response{
+     "systemRuleList": [
+        {
+            "ruleId": 1,
+            "ruleDetail": "宇宙为什么会这样？"
+        },
+        {
+            "ruleId": 2,
+            "ruleDetail": "无所谓了,生活就是如此"
+        },
+        {
+            "ruleId": 3,
+            "ruleDetail": "软件工程师是不是真的"
+        },
+        {
+            "ruleId": 4,
+            "ruleDetail": "止于至善"
+        }
+    ]
+}
+```
+
+
+##管理员更新系统规则
+```javascript
+requestUrl = '/helps/rules/id/update/'
+method = 'PUT'
+
+data{
+    'adminId':'1'
+    'password':'hukars'
+    'ruleDetail':'宇宙为什么会这样'
+}
+//success
+response{
+    "ruleId": 1,
+    "ruleDetail": "宇宙为什么会这样",
+    "result": "ok"
+}
+
+//fail
+response{
+    'result': 'failed',
+    'reason':'your information is wrong!'
+}
+
+```
+
+##管理员删除系统规则
+```javascript
+requestUrl = '/helps/rules/id/delete/'
+method = 'DELETE'
+
+data{
+     'adminId':'1'
+    'password':'hukars'
+}
+
+//success
+response{
+     "result": "ok"
+}
+//fail
+response{
+    'result': 'failed',
+    'reason':'your information is wrong!'
+}
+
+```
+
+##查看常见问题
+```javascript
+requestUrl = '/helps/problems/'
+method = 'GET'
+query_params{
+    无
+}
+
+response{
+    "systemRuleList": [
+        {
+            "questionId": 1,
+            "questionName": "我是谁",
+            "questionSolution": "管理员"
+        },
+        {
+            "questionId": 2,
+            "questionName": "谁是逼王",
+            "questionSolution": "李文强"
+        },
+        {
+            "questionId": 3,
+            "questionName": "爱在西元前谁编曲的",
+            "questionSolution": "周杰伦"
+        },
+        {
+            "questionId": 4,
+            "questionName": "软四班草？",
+            "questionSolution": "表面兄弟"
+        }
+    ]
+}
+```
+
+
+
+
+
+
+

@@ -1,0 +1,79 @@
+##用户注册
+```javascript
+requestUrl = '/persons/userRegister/'
+method = 'POST'
+
+data{
+    'userName':'1974921043@qq.com'
+    'password':'gggg'
+    'nickName':''
+}
+//success
+reponse{
+    "userName": "1974921043@qq.com",
+    "password":"gggg"
+    "nickname": "",
+    "remainder": 0,
+    "result": "ok"
+}
+//fail
+response{
+   'result':'failed',
+   'reason':'The email has been used!'
+}
+{
+    'result':'failed',
+    'reason':'Email form is not right!'
+}
+```
+
+#用户登录
+```javascript
+requestUrl = '/persons/userLogin/?userName=1974921042@qq.com&password=gggg'
+method='GET'
+query_params{
+    'userName':''
+    'password':''
+}
+
+//success
+{
+    "userName": "1974921043@qq.com",
+    "password": "gggg",
+    "nickname": "",
+    "remainder": 0,
+    "result": "ok"
+}
+
+//fail
+response
+{
+    "result": "failed",
+    "reason": "wrong userName"
+}
+
+```
+
+#管理员登录
+```javascript
+requestUrl = '/persons/adminLogin/?adminId=1&password=hukars'
+method='GET'
+query_params{
+    'adminId':''
+    'password':''
+}
+
+response
+//success
+{
+   "result": "ok"
+}
+//fail
+response
+{
+  "result": "failed",
+  "reason": "you have no access permission"
+}
+```
+
+

@@ -1,0 +1,192 @@
+## 处理管理员获取所有书籍列表API
+```javascript
+requestUrl = '/books/list/'
+method = "GET"
+
+// 请求字段
+params{
+    无
+}
+
+Response{
+    "books": [
+        {
+            "id": 1,
+            "bookName": "软件测试方法与实践",
+            "bookAuthor": "郁莲",
+            "bookType": "计算机科学",
+            "bookPress": "清华大学出版社",
+            "bookPublishDate": "2008年11月2日",
+            "bookPrice": 28.0,
+            "bookNumbers": 3,
+            "bookImageUrl": [
+                ""
+            ],
+            "bookAuthorIntroduction": "",
+            "bookIntroduction": ""
+        },
+        {
+            "id": 3,
+            "bookName": "思考,快与慢",
+            "bookAuthor": "丹尼尔•卡尼曼 (Daniel Kahneman)",
+            "bookType": "心理学",
+            "bookPress": "中信出版集团股份有限公司",
+            "bookPublishDate": "2012年7月1日",
+            "bookPrice": 30.0,
+            "bookNumbers": 48,
+            "bookImageUrl": [
+                ""
+            ],
+            "bookAuthorIntroduction": "",
+            "bookIntroduction": ""
+        }
+    ]
+}
+```
+##处理用户获取一本书详细信息API
+```javascript
+requestUrl = '/books/id/detail/'
+method = "GET"
+
+// 请求字段
+params{
+    无
+}
+
+response{
+     "id": 3,
+    "bookName": "思考,快与慢",
+    "bookAuthor": "丹尼尔•卡尼曼 (Daniel Kahneman)",
+    "bookType": "心理学",
+    "bookPress": "中信出版集团股份有限公司",
+    "bookPublishDate": "2012年7月1日",
+    "bookPrice": 30,
+    "bookNumbers": 48,
+    "bookImageUrl": [
+        ""
+    ],
+    "bookAuthorIntroduction": "",
+    "bookIntroduction": ""
+}
+```
+
+##处理查询书籍的请求
+```javascript
+requestUrl = '/books/search/?bookName=软件&bookAuthor=丹'
+method = "GET"
+
+// 请求字段
+params{
+    bookName:''
+    bookAuthor:''
+    bookType:''//类型前后端统一待定
+}
+//三个参数任选一个，如果超过一个，查询优先级bookName>bookAuthor>bookType
+
+response{
+   "books": [
+        {
+            "id": 1,
+            "bookName": "软件测试方法与实践",
+            "bookAuthor": "郁莲",
+            "bookType": "计算机科学",
+            "bookPress": "清华大学出版社",
+            "bookPublishDate": "2008年11月2日",
+            "bookPrice": 28,
+            "bookNumbers": 3,
+            "bookImageUrl": [
+                ""
+            ],
+            "bookAuthorIntroduction": "",
+            "bookIntroduction": ""
+        }
+    ]
+}
+```
+
+##处理管理员添加书籍的请求
+```javascript
+requestUrl = '/books/creation/'
+method = "POST"
+
+// 请求字段
+data{
+    adminId:1
+    password:'hukars'
+    bookName:''
+    bookType:''
+    bookPress:''
+    ....//一本新书的各种相关信息
+}
+
+//success
+response{
+     "result": "ok"
+}
+
+//fail没有管理员权限
+response{
+   'result': 'failed',
+   'reason':'your information is wrong!'
+}
+```
+
+##处理管理员更新书籍信息的请求
+```javascript
+requestUrl = '/books/id/update/'
+method = "PUT"
+
+// 请求字段
+data{
+    adminId:1
+    password:hukars
+    bookAuthor:'丹尼尔•卡尼曼 (Daniel Kahneman) '
+    ....//需要更新的信息
+}
+
+//success
+response{
+     "id": 3,
+    "bookName": "思考,快与慢",
+    "bookAuthor": "丹尼尔•卡尼曼 (Daniel Kahneman)",
+    "bookType": "心理学",
+    "bookPress": "中信出版集团股份有限公司",
+    "bookPublishDate": "2012年7月1日",
+    "bookPrice": 30,
+    "bookNumbers": 48,
+    "bookImageUrl": "",
+    "bookAuthorIntroduction": "",
+    "bookIntroduction": "",
+    "result": "ok"
+}
+
+//fail没有管理员权限
+response{
+   'result': 'failed',
+   'reason':'your information is wrong!'
+}
+```
+
+##处理管理员删除书籍的请求
+```javascript
+requestUrl = '/books/id/delete/'
+method = "DELETE"
+
+// 请求字段
+data{
+    adminId:1
+    password:hukars
+}
+
+//success
+response{
+    'result': "ok"
+}
+
+//fail没有管理员权限
+response{
+   'result': 'failed',
+   'reason':'your information is wrong!'
+}
+```
+

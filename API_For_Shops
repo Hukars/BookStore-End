@@ -1,0 +1,185 @@
+#####注：失败返回格式全部采用
+response{
+   'result':'failed',
+   'reason':'.......'
+}
+
+
+
+##处理用户加入购物车请求
+```javascript
+requestUrl = '/shops/cartItems/add/'
+method = "POST"
+
+// 请求字段
+data{
+  "userName","1974921044@qq.com"  ,
+   bookId:3
+   bookNumber:2
+}
+
+//success
+response{
+    'result': "ok"
+}
+//fail
+多种可能:加入数量过多，数据错误
+```
+
+##处理用户付钱请求,等效于创建一个订单和若干购物记录
+```javascript
+requestUrl = '/shops/orders/add/'
+method = "POST"
+
+// 请求字段
+data{
+  "userName","1974921044@qq.com"  ,
+  "password":"hunan" ,
+  "totalMoney":346 ,
+  "ids ":[2,3] #购物车条目id，一份订单中可能买了多种不同的书，每种书对应一个购物车条目
+  created_at:"2018-01-02 20:56:28"
+}
+
+//success
+response{
+    'result': "ok"
+}
+//fail
+多种可能:钱不够，密码错误，并发冲突，数据错误
+```
+
+##处理用户查看订单列表请求
+```javascript
+requestUrl = '/shops/orders//?userName=1974921044@qq.com&password=hunan'
+method='GET'
+query_params{
+    'userName':'1974921044@qq.com'
+    'password':'hunan'
+}
+
+response{
+     "shoppingOrderList": [
+        {
+            "id": 1,
+            "created_at": "2018-01-02 21:56:28",
+            "deliveryTime": "",
+            "orderState": 0,
+            "totalMoney": 60
+        },
+        {
+            "id": 2,
+            "created_at": "2018-01-02 22:56:28",
+            "deliveryTime": "",
+            "orderState": 0,
+            "totalMoney": 56
+        },
+        {
+            "id": 3,
+            "created_at": "2018-01-02 22:52:28",
+            "deliveryTime": "",
+            "orderState": 0,
+            "totalMoney": 150
+        }
+    ]
+}
+
+```
+
+##处理用户查看订单号为id的购物记录请求
+```javascript
+requestUrl='/shops/orders/id/records/?userName=1974921044@qq.com&password=hunan'
+method='GET'
+query_params{
+    'userName':'1974921044@qq.com'
+    'password':'hunan'
+}
+
+response{
+
+    "shoppingRecordList": [
+        {
+            "id": 1,
+            "book": 3,
+            "user": "1974921044@qq.com",
+            "bookNumber": 2,
+            "shoppingOrder": 1
+        }
+    ]
+}
+
+```
+
+##处理用户删除没有发货订单需求
+```javascript
+requestUrl = '/shops/orders/id/delete/'
+method = 'DELETE'
+
+data{
+    'userName':'1974921044@qq.com'
+    'password':'hunan'
+}
+
+//successs
+
+
+
+//fail 已经发货的订单，用户没有权限删除此订单
+
+```
+
+##处理管理员查看所有订单需求
+```javascript
+requestUrl = '/shops/allOrders/?adminId=1&password=hukars'
+method='GET'
+query_params{
+    'adminId':'1'
+    'password':'hukars'
+}
+
+response{
+     "allOrders": [
+        {
+            "id": 1,
+            "created_at": "2018-01-02 21:56:28",
+            "deliveryTime": "",
+            "orderState": 0,
+            "totalMoney": 60
+        },
+        {
+            "id": 2,
+            "created_at": "2018-01-02 22:56:28",
+            "deliveryTime": "",
+            "orderState": 0,
+            "totalMoney": 56
+        },
+        {
+            "id": 3,
+            "created_at": "2018-01-02 22:52:28",
+            "deliveryTime": "",
+            "orderState": 0,
+            "totalMoney": 150
+        }
+    ]
+}
+
+```
+
+##处理管理员处理订单需求-发货
+```javascript
+requestUrl = '/shops/orders/id/update/'
+method='PUT'
+//请求字段
+data{
+    'adminId':'1'
+    'password':'hukars'
+    deliveryTime:''//发货时间
+}
+
+//成功
+response{
+     "result": "ok"
+}
+
+//失败：管理员账号错误或者是已经发货的订单
+```
+
