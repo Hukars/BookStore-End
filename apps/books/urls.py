@@ -6,6 +6,8 @@ urlpatterns = [
     url(r'^search/$', views.BookSearch.as_view()),
     url(r'^(?P<id>[0-9]+)/detail/$',views.BookDetail.as_view()),
     url(r'^list/$',views.BookList.as_view()),
+    url(r'^new/$',views.BookNew.as_view()),
+    url(r'^popular/$',views.BookPopular.as_view()),
     url(r'^creation/$', views.BookCreation.as_view()),
     url(r'^(?P<id>[0-9]+)/update/$', views.BookUpdate.as_view()),
     url(r'^(?P<id>[0-9]+)/delete/$', views.BookDelete.as_view()),

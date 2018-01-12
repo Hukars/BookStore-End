@@ -51,8 +51,24 @@ response
     "result": "failed",
     "reason": "wrong userName"
 }
-
 ```
+
+#用户退出登录
+```javascript
+requestUrl = '/persons/userLogout/'
+method='DELETE'
+data{
+    无
+}
+
+//success
+{
+    "result": "You're logged out."
+}
+//fail
+用户根本没有登录
+```
+
 
 #管理员登录
 ```javascript

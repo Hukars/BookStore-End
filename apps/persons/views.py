@@ -15,12 +15,12 @@ from rest_framework.views import APIView
 import re
 # Create your views here.
 
-#判断用户邮箱格式是否合理
-def validateEmail(email):
-    if len(email) > 7:
-        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) != None:
-            return True
-    return False
+# #判断用户邮箱格式是否合理
+# def validateEmail(email):
+#     if len(email) > 7:
+#         if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) != None:
+#             return True
+#     return False
 
 
 def get_objects_by_userName(userName):
@@ -36,9 +36,9 @@ class UserRegister(APIView):
     def post(self,request):
         requestDict = request.data.dict()
         userName = requestDict["userName"]
-        #邮箱格式是否正确
-        if validateEmail(userName)==False:
-            return Response({'result':'failed','reason':'Email form is not right!'})
+        # #邮箱格式是否正确，前端工作
+        # if validateEmail(userName)==False:
+        #     return Response({'result':'failed','reason':'Email form is not right!'})
         #是否重复注册
         userObject = User.objects.filter(userName=userName)
         if userObject.exists():
@@ -78,9 +78,24 @@ class UserLogin(APIView):
                  responseDict = serializer.data
                  #del (responseDict['password'])
                  responseDict['result'] = 'ok'
+                 #传递cookie
+                 request.session['member_id'] = user.userName
                  return Response(responseDict)
              else:
                  return Response({'result' : 'failed','reason' : 'wrong password'})
+class UserLogout(APIView):
+    """
+    用户退出登录状态
+    """
+    def delete(self,request):
+        if ("member_id" in request.session) == False:
+            return Response({'result': 'failed', 'reason': 'Please log in first!'})
+        try:
+            del request.session['member_id']
+        except KeyError:
+            pass
+        return Response({'result':"You're logged out."})
+
 class AdminLogin(APIView):
     """
     管理员登录，检查账号是否正确

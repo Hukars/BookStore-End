@@ -18,7 +18,7 @@ def splitPictureURL(image_url):
     """
     以逗号为分隔符切割图片URL，转化为一个数组
     """
-    images = image_url.split(',')
+    images = image_url.split('jpg,')
     return images
 
 #----------总体实现图书的增、删、改、查，其中增删改只面向管理员
@@ -35,6 +35,40 @@ class BookList(APIView):
             bookObjectDict['bookImageUrl'] = splitPictureURL(bookObjectDict['bookImageUrl'])
             responseDict.append(bookObjectDict)
         return Response({'books':responseDict})
+class BookNew(APIView):
+    """
+    返回最新上架书籍信息
+    """
+    def get(self,request):
+        bookObjectSet = Book.objects.all().order_by('-id')
+        counter = 0
+        responseDict = []
+        for e in bookObjectSet:
+            if(counter!=4):
+                counter += 1
+                bookObjectDict = model_to_dict(e)
+                bookObjectDict['bookImageUrl'] = splitPictureURL(bookObjectDict['bookImageUrl'])
+                responseDict.append(bookObjectDict)
+            else:
+                return Response({'books': responseDict})
+
+class BookPopular(APIView):
+    """
+    返回畅销书籍
+    """
+    def get(self, request):
+        bookObjectSet = Book.objects.all().order_by('bookNumbers')
+        counter = 0
+        responseDict = []
+        for e in bookObjectSet:
+            if (counter != 4):
+                counter += 1
+                bookObjectDict = model_to_dict(e)
+                bookObjectDict['bookImageUrl'] = splitPictureURL(bookObjectDict['bookImageUrl'])
+                responseDict.append(bookObjectDict)
+            else:
+                return Response({'books': responseDict})
+
 
 class BookDetail(APIView):
     """

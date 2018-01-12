@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^adminLogin/$',views.AdminLogin.as_view()),
     url(r'^userRegister/$',views.UserRegister.as_view()),
     url(r'^userLogin/$',views.UserLogin.as_view()),
+    url(r'^userLogout/$', views.UserLogout.as_view())
 ]

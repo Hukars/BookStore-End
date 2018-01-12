@@ -6,14 +6,40 @@ response{
 
 
 
-##处理用户加入购物车请求
+##处理用户查看购物车请求,需保证登录状态
+```javascript
+requestUrl = '/shops/cartItems/'
+method = "GET"
+
+// 请求字段
+query_params{
+   无
+}
+
+//success
+response{
+    "shoppingCartList": [
+        {
+            "id": 4,
+            "book": 12,
+            "user": "1974921044@qq.com",
+            "singlePrice": 46.8,
+            "bookNumber": 2,
+            "totalPrice": 93.6
+        }
+    ]
+}
+//fail
+用户未登录
+```
+
+##处理用户加入购物车请求,需保证登录状态
 ```javascript
 requestUrl = '/shops/cartItems/add/'
 method = "POST"
 
 // 请求字段
 data{
-  "userName","1974921044@qq.com"  ,
    bookId:3
    bookNumber:2
 }
@@ -23,21 +49,17 @@ response{
     'result': "ok"
 }
 //fail
-多种可能:加入数量过多，数据错误
+多种可能:用户未登录，加入数量过多，数据错误
 ```
 
-##处理用户付钱请求,等效于创建一个订单和若干购物记录
+##处理用户删除购物车条目请求,需保证登录状态
 ```javascript
-requestUrl = '/shops/orders/add/'
-method = "POST"
+requestUrl = '/shops/cartItems/(?P<id>[0-9]+)/delete/'
+method = "DELETE"
 
 // 请求字段
 data{
-  "userName","1974921044@qq.com"  ,
-  "password":"hunan" ,
-  "totalMoney":346 ,
-  "ids ":[2,3] #购物车条目id，一份订单中可能买了多种不同的书，每种书对应一个购物车条目
-  created_at:"2018-01-02 20:56:28"
+   无
 }
 
 //success
@@ -45,16 +67,60 @@ response{
     'result': "ok"
 }
 //fail
-多种可能:钱不够，密码错误，并发冲突，数据错误
+多种可能:用户未登录，没有权限
 ```
 
-##处理用户查看订单列表请求
+
+##处理用户更新购物车某本书购买数量,需保证登录状态
 ```javascript
-requestUrl = '/shops/orders//?userName=1974921044@qq.com&password=hunan'
+requestUrl = '/shops/cartItems/(?P<id>[0-9]+)/update/'
+method = "PUT"
+
+// 请求字段
+data{
+   'bookNumber':
+}
+
+//success
+response{
+    "id": 5,
+    "book": 12,
+    "user": "1974921044@qq.com",
+    "bookNumber": 4,
+    "totalPrice": 187.2,
+    "result": "ok"
+}
+//fail
+多种可能:用户未登录，没有权限,数据错误
+```
+
+
+##处理用户付钱请求,等效于创建一个订单和若干购物记录，需要用户登录状态
+```javascript
+requestUrl = '/shops/orders/add/'
+method = "POST"
+
+// 请求字段
+data{
+  "totalMoney":187.2 ,
+  "ids ":[5，] #购物车条目id，一份订单中可能买了多种不同的书，每种书对应一个购物车条目
+  'created_at':"2018-01-12 14:38:28"
+}
+
+//success
+response{
+    'result': "ok"
+}
+//fail
+多种可能:钱不够，没有登录，并发冲突，数据错误
+```
+
+##处理用户查看订单列表请求，需保证登录状态
+```javascript
+requestUrl = '/shops/orders/'
 method='GET'
 query_params{
-    'userName':'1974921044@qq.com'
-    'password':'hunan'
+   无
 }
 
 response{
@@ -82,16 +148,16 @@ response{
         }
     ]
 }
-
+//fail
+用户未登录
 ```
 
 ##处理用户查看订单号为id的购物记录请求
 ```javascript
-requestUrl='/shops/orders/id/records/?userName=1974921044@qq.com&password=hunan'
+requestUrl='/shops/orders/id/records/'
 method='GET'
 query_params{
-    'userName':'1974921044@qq.com'
-    'password':'hunan'
+   无
 }
 
 response{
@@ -115,15 +181,15 @@ requestUrl = '/shops/orders/id/delete/'
 method = 'DELETE'
 
 data{
-    'userName':'1974921044@qq.com'
-    'password':'hunan'
+   无
+}
+//success
+{
+    "result": "ok"
 }
 
-//successs
-
-
-
-//fail 已经发货的订单，用户没有权限删除此订单
+//fail
+已经发货的订单，用户未登录
 
 ```
 
