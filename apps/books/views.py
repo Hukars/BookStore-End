@@ -19,7 +19,14 @@ def splitPictureURL(image_url):
     以逗号为分隔符切割图片URL，转化为一个数组
     """
     images = image_url.split('jpg,')
-    return images
+    finalImages = []
+    for e in images:
+        if 'jpg' not in e:
+            e += 'jpg'
+            finalImages.append(e)
+        else:
+            finalImages.append(e)
+    return finalImages
 
 #----------总体实现图书的增、删、改、查，其中增删改只面向管理员
 

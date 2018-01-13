@@ -27,18 +27,19 @@ for e in cartItemsIds:
     print(int(e))
 
 
-data={
-    'adminId': 1,
-    'password': 'hukars',
-    'ruleId':6,
-    'ruleDetail':'hhhhhhhhhh'
-}
+def splitPictureURL(image_url):
+    """
+    以逗号为分隔符切割图片URL，转化为一个数组
+    """
+    images = image_url.split('jpg,')
+    finalImages = []
+    for e in images:
+        if 'jpg' not in e:
+            e += 'jpg'
+            finalImages.append(e)
+        else:
+            finalImages.append(e)
+    print(finalImages)
+    return finalImages
 
-pararms = urllib.parse.urlencode(data)
-headers = {"Content-type": "application/x-www-form-urlencoded"}
-conn = http.client.HTTPConnection("127.0.0.1:8000")
-conn.request('POST', '/helps/rules/add/', pararms, headers)
-response = conn.getresponse()
-print(response.status, response.reason)
-res = response.read()
-print(res)
+splitPictureURL('https://images-cn.ssl-images-amazon.com/images/I/51kxMQVKCwL._SX325_BO1,204,203,200_.jpg,https://images-cn.ssl-images-amazon.com/images/I/51QIzxaHz8L._AC_SX60_CR,0,0,60,60_.jpg')

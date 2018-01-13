@@ -12,5 +12,5 @@ class Book(models.Model):
     bookPrice = models.FloatField(default=100.0)
     bookNumbers = models.IntegerField(default=1)#销售剩余数量
     bookImageUrl = models.URLField(max_length=500,default="")
-    bookAuthorIntroduction = models.TextField(max_length=500,default="")
-    bookIntroduction = models.TextField(max_length=500,default="")
+    bookAuthorIntroduction = models.CharField(max_length=500,default="")
+    bookIntroduction = models.CharField(max_length=1000,default="")
