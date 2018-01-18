@@ -6,7 +6,7 @@ method = 'POST'
 data{
     'userName':'1974921043@qq.com'
     'password':'gggg'
-    'nickName':''
+    'nickname':''
 }
 //success
 reponse{
@@ -40,7 +40,8 @@ query_params{
 {
     "userName": "1974921043@qq.com",
     "password": "gggg",
-    "nickname": "",
+    "nickname": "gggg",
+    "uuid": "d620cdb0-fbf7-11e7-8174-acd1b8a604ac",
     "remainder": 0,
     "result": "ok"
 }
@@ -58,10 +59,11 @@ response
 requestUrl = '/persons/userLogout/'
 method='DELETE'
 data{
-    无
+    'uuid':....
 }
 
 //success
+最终uuid = ''
 {
     "result": "You're logged out."
 }

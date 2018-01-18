@@ -19,16 +19,14 @@ import re
 #----------用户购物车：计划实现操作：加入购物车，删除出购物车,获取购物车List
 class ShoppingCartList(APIView):
     """
-    处理用户获取购物车所有条目的请求，需要用户登录状态，返回书和书的一些相关信息
+    处理用户获取购物车所有条目的请求，需要用户登录状态uuid，返回书和书的一些相关信息
     """
     def get(self,request):
-        #requestDict = request.query_params.dict()
-        if ("member_id"  in  request.session)==False:
+        requestDict = request.query_params.dict()
+        if ("uuid"  in  requestDict)==False:
             return Response({'result':'failed','reason': 'Please log in first!'})
-        userName = request.session['member_id']
-
         # 通过用户名获取所有条目
-        userObject = get_object_or_404(User,userName = userName)
+        userObject = get_object_or_404(User,uuid = requestDict['uuid'])
         shoppingCartList = ShoppingCart.objects.filter(user=userObject)
         #处理对象集
         resposeDict = []
@@ -39,20 +37,14 @@ class ShoppingCartList(APIView):
 
 class AddCart(APIView):
     """
-    处理用户加入购物车请求,需要用户登录是登录状态，并提供bookId，bookNumber属性
+    处理用户加入购物车请求,需要用户登录是登录状态uuid，并提供bookId，bookNumber属性
     """
     def post(self,request):
         #检查请求字段是否有userName，bookID和bookNumber
         requestDict = request.data.dict()
-        if('bookId' in requestDict and 'bookNumber' in requestDict)==False:
-            return Response({'result':'failed','reason': 'missing bookId or bookNumber'})
-
-        # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result':'failed','reason': 'Please log in first!'})
-        userName = request.session['member_id']
-
-        userObject = get_object_or_404(User,userName = userName)
+        if('bookId' in requestDict and 'bookNumber' in requestDict and 'uuid' in requestDict)==False:
+            return Response({'result':'failed','reason': 'missing bookId or bookNumber or uuid'})
+        userObject = get_object_or_404(User, uuid=requestDict['uuid'])
         bookObject = get_object_or_404(Book,id = requestDict['bookId'])
         #如果用户强行加入比库存还多的书，返回错误信息
         if int(requestDict['bookNumber']) > bookObject.bookNumbers:
@@ -79,18 +71,17 @@ class AddCart(APIView):
 
 class DeleteCart(APIView):
     '''
-    处理用户删除购物车一个条目的请求，需要用户登录状态和条目的id
+    处理用户删除购物车一个条目的请求，需要用户登录状态uuid和条目的id
     '''
     def delete(self,request,id):
         requestDict = request.data.dict()
-        # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        userName = request.session['member_id']
+        if ("uuid"  in  requestDict)==False:
+            return Response({'result':'failed','reason': 'Please log in first!'})
         #获取条目，并验证用户名
+        userObject = get_object_or_404(User, uuid=requestDict['uuid'])
         shoppingCartObject = get_object_or_404(ShoppingCart,id=id)
         shoppingCartSerializer = ShoppingCartSerializer(data=model_to_dict(shoppingCartObject))
-        userObject = get_object_or_404(User,userName = userName)
+
         if shoppingCartSerializer.is_valid():
             if(userObject == shoppingCartSerializer.validated_data['user']):
                 shoppingCartObject.delete()
@@ -100,26 +91,21 @@ class DeleteCart(APIView):
         return Response(shoppingCartSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class UpdateCart(APIView):
     """
-    处理用户修改购物车一个条目的请求，在这里特指想买书的数量,需要用户登录状态和条目的id和bookNumber
+    处理用户修改购物车一个条目的请求，在这里特指想买书的数量,需要用户登录状态uuid和条目的id和bookNumber
     """
     def put(self,request,id):
         requestDict = request.data.dict()
         # 判断是否有bookNumber
-        if ('bookNumber' in requestDict) == False:
-            return Response({'result':'failed','reason': 'missing bookNumber'})
-        if len(requestDict)>1:
+        if ('bookNumber' in requestDict and 'uuid' in requestDict) == False:
+            return Response({'result':'failed','reason': 'missing bookNumber or uuid'})
+        if len(requestDict)>2:
             return Response({'result':'failed','reason': 'You can only update the number of books'})
-
-        # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        userName = request.session['member_id']
-
         # 获取条目，并验证用户名
+        userObject = get_object_or_404(User, uuid=requestDict['uuid'])
         shoppingCartObject = get_object_or_404(ShoppingCart, id=id)
         singlePrice = shoppingCartObject.totalPrice/shoppingCartObject.bookNumber
         shoppingCartSerializer = ShoppingCartSerializer(shoppingCartObject, data=request.data)
-        userObject = get_object_or_404(User, userName=userName)
+
         if shoppingCartSerializer.is_valid():
             if (userObject == shoppingCartObject.user):
                 shoppingCartSerializer.validated_data['totalPrice'] = singlePrice* (float)(requestDict['bookNumber'])
@@ -141,16 +127,14 @@ def getOrderFromRecord(shoppingRecordSet):#根据购物记录找出所有的订�
 
 class OrderList(APIView):
     """
-    用户查看订单列表，需要用户登录状态
+    用户查看订单列表，需要用户登录状态uuid
     """
     def get(self,request):
         responseDict = []
-        # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        userName = request.session['member_id']
-        userObject = get_object_or_404(User, userName=userName)
-
+        requestDict = request.query_params.dict()
+        if ("uuid"  in  requestDict)==False:
+            return Response({'result':'failed','reason': 'Please log in first!'})
+        userObject = get_object_or_404(User, uuid=requestDict['uuid'])
         # 通过用户获取购物记录和订单
         shoppingRecordSet = ShoppingRecord.objects.filter(user=userObject)
         shoppingOrderSet = []
@@ -166,15 +150,14 @@ class OrderList(APIView):
         return Response({"shoppingOrderList":responseDict})
 class RecordList(APIView):
     """
-    用户查看某个订单的购物记录List，需要用户登录状态和订单id
+    用户查看某个订单的购物记录List，需要用户登录状态uuid和订单id
     """
     def get(self,request,id):
-        # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        userName = request.session['member_id']
+        requestDict = request.query_params.dict()
+        if ("uuid"  in  requestDict)==False:
+            return Response({'result':'failed','reason': 'Please log in first!'})
 
-        userObject = get_object_or_404(User, userName=userName)
+        userObject = get_object_or_404(User, uuid=requestDict['uuid'])
         shoppingOrderObject = get_object_or_404(ShoppingOrder,id=id)
         shoppingRecordSet = ShoppingRecord.objects.filter(shoppingOrder=shoppingOrderObject)
         # 返回订单号为id的购物记录信息
@@ -188,17 +171,14 @@ class RecordList(APIView):
 
 class AddOrder(APIView):
     """
-    用户支付环节，生成一条订单记录和若干购买记录，需要用户登录状态，以及提供totalMoney,created_at以及选择支付的每个购物车条目的ids
+    用户支付环节，生成一条订单记录和若干购买记录，需要用户登录状态uuid，以及提供totalMoney,created_at以及选择支付的每个购物车条目的ids
     """
     def post(self,request):
         requestDict = request.data.dict()
-        if('totalMoney' in requestDict and 'created_at' in requestDict and  'ids' in requestDict) == False:
-            return Response({'result':'failed','reason': 'missing totalMoney,created_at or ids'})
-        # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        userName = request.session['member_id']
-        userObject = get_object_or_404(User, userName=userName)
+        if('totalMoney' in requestDict and 'created_at' in requestDict and  'ids' in requestDict and 'uuid' in requestDict) == False:
+            return Response({'result':'failed','reason': 'missing totalMoney,created_at or ids or uuid'})
+
+        userObject = get_object_or_404(User, uuid = requestDict['uuid'])
         #钱不够
         if(userObject.remainder < float(requestDict['totalMoney'])):
             return Response({'result':'failed','reason': 'remainde is not enough!'})
@@ -287,14 +267,14 @@ class UpdateOrder(APIView):
 
 class DeleteOrder(APIView):
     """
-    用户删除还没有发货订单，需要用户登录状态和订单的id
+    用户删除还没有发货订单，需要用户登录状态uuid和订单的id
     """
     def delete(self,request,id):
         # 通过cookie验证用户是否登录
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        userName = request.session['member_id']
-        userObject = get_object_or_404(User, userName=userName)
+        requestDict = request.data.dict()
+        if ("uuid"  in  requestDict)==False:
+            return Response({'result':'failed','reason': 'Please log in first!'})
+        userObject = get_object_or_404(User, uuid = requestDict['uuid'])
         #获取订单
         shoppingOrderObject = get_object_or_404(ShoppingOrder,id=id)
         #检验是否发货

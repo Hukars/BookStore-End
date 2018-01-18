@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 import re
+import uuid
 # Create your views here.
 
 # #判断用户邮箱格式是否合理
@@ -74,27 +75,36 @@ class UserLogin(APIView):
          else:
              user = userSet[0]
              if requestDict['password'] == user.password:
-                 serializer = UserSerializer(user)
+                 if(user.uuid != ''):
+                     return Response({'result': 'You can not login second!'})
+                 serializer = UserSerializer(user,data=request.data)
+                 uuidNumber = uuid.uuid1()
+                 if serializer.is_valid():
+                     serializer.validated_data['uuid'] = uuidNumber
+                     serializer.save()
                  responseDict = serializer.data
                  #del (responseDict['password'])
                  responseDict['result'] = 'ok'
-                 #传递cookie
-                 request.session['member_id'] = user.userName
+                 responseDict['uuid'] = uuidNumber
                  return Response(responseDict)
              else:
                  return Response({'result' : 'failed','reason' : 'wrong password'})
 class UserLogout(APIView):
     """
-    用户退出登录状态
+    用户退出登录状态,需要uuid
     """
     def delete(self,request):
-        if ("member_id" in request.session) == False:
-            return Response({'result': 'failed', 'reason': 'Please log in first!'})
-        try:
-            del request.session['member_id']
-        except KeyError:
-            pass
-        return Response({'result':"You're logged out."})
+        requestDict = request.data.dict()
+        if ('uuid' in requestDict) == False:
+            return Response({'result': 'failed', 'reason': 'Please send your uuid first!'})
+        userObject = get_object_or_404(User,uuid = requestDict['uuid'])
+        serializer = UserSerializer(userObject,data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data['uuid'] = ''
+            serializer.save()
+            return Response({'result':"You're logged out."})
+        else:
+            return Response({'result': 'failed', 'reason': 'Invalid data'})
 
 class AdminLogin(APIView):
     """
